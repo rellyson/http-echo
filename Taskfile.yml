@@ -1,0 +1,10 @@
+version: "3"
+
+tasks:
+  build:
+    desc: "Build the server binary"
+    cmd: "go build -o bin/http-echo ./cmd/server/main.go"
+
+  docker-build:
+    desc: "Build the docker image"
+    cmd: "docker build -t rellyson/http-echo ."
