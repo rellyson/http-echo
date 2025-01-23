@@ -1,17 +1,65 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"errors"
+	"flag"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/rellyson/http-echo/pkg/version"
+	"github.com/rellyson/http-echo/internal/handlers"
+	"github.com/rellyson/http-echo/pkg/middlewares"
+)
+
+var (
+	listenFlag          = flag.String("listen", ":3000", "Address to listen on")
+	defaultReadTimeout  = 3 * time.Second
+	defaultWriteTimeout = 3 * time.Second
 )
 
 func main() {
-	version, err := version.GetVersion()
+	flag.Parse()
 
-	if err != nil {
-		panic(err)
+	mux := http.NewServeMux()
+	mux.Handle("GET /metrics", handlers.Metrics())
+	mux.HandleFunc("GET /health", handlers.HealthCheck)
+	mux.HandleFunc("/", handlers.Echo)
+
+	mw := middlewares.CreateStack(
+		middlewares.Recover,
+		middlewares.Logging,
+	)
+	server := &http.Server{
+		Addr:         *listenFlag,
+		Handler:      mw(mux),
+		ReadTimeout:  defaultReadTimeout,
+		WriteTimeout: defaultWriteTimeout,
 	}
 
-	fmt.Printf("Hello world from HTTP Echo version: %s build: %s!\n", version.Version, version.Build)
+	go func() {
+		log.Printf("[INFO] server listening on %s", *listenFlag)
+
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("[ERROR] server exited with: %s", err)
+		}
+	}()
+
+	signalCh := make(chan os.Signal, 1)
+	signal.Notify(signalCh, os.Interrupt, syscall.SIGTERM)
+
+	// Wait for interrupt
+	<-signalCh
+
+	log.Printf("[INFO] received interrupt, shutting down...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("[ERROR] failed to shutdown server: %s", err)
+	}
 }
