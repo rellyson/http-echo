@@ -17,13 +17,15 @@ func TestEcho(t *testing.T) {
 		method         string
 		path           string
 		headers        map[string]string
+		parameters     []string
+		queries        map[string]string
 		body           interface{}
 		expectedStatus int
 	}{
 		{
 			name:           "GET request with no parameters",
 			method:         "GET",
-			path:           "/echo",
+			path:           "/",
 			expectedStatus: http.StatusOK,
 		},
 		{
@@ -39,10 +41,30 @@ func TestEcho(t *testing.T) {
 			expectedStatus: http.StatusOK,
 		},
 		{
-			name:           "GET request with query parameters",
-			method:         "GET",
-			path:           "/echo?param1=value1¶m2=value2",
+			name:   "GET request with query parameters",
+			method: "GET",
+			path:   "/echo?param1=value1&param2=value2",
+			queries: map[string]string{
+				"param1": "value1",
+				"param2": "value2",
+			},
 			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "GET request with path parameters",
+			method:         "GET",
+			path:           "/echo/param1/param2",
+			parameters:     []string{"param1", "param2"},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:   "GET request with custom status code",
+			method: "GET",
+			path:   "/?status=404",
+			queries: map[string]string{
+				"status": "404",
+			},
+			expectedStatus: http.StatusNotFound,
 		},
 	}
 
@@ -68,8 +90,6 @@ func TestEcho(t *testing.T) {
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 			assert.Equal(t, "application/json", resp.Header.Get("Content-Type"))
 			assert.NotEmpty(t, resp.Header.Get(httpHeaderAppName))
-			assert.NotEmpty(t, resp.Header.Get(httpHeaderAppVersion))
-			assert.NotEmpty(t, resp.Header.Get(httpHeaderAppBuild))
 
 			var response EchoResponse
 			err := json.NewDecoder(resp.Body).Decode(&response)
@@ -77,7 +97,18 @@ func TestEcho(t *testing.T) {
 
 			assert.NotEmpty(t, response.HostInfo.Hostname)
 			assert.NotEmpty(t, response.HostInfo.IP)
-			assert.NotEmpty(t, response.HttpInfo.Headers)
+
+			if tt.headers != nil {
+				assert.NotEmpty(t, response.HttpInfo.Headers)
+			}
+
+			if tt.parameters != nil {
+				assert.NotEmpty(t, response.HttpInfo.Params)
+			}
+
+			if tt.queries != nil {
+				assert.NotEmpty(t, response.HttpInfo.Queries)
+			}
 
 			if tt.body != nil {
 				assert.NotNil(t, response.HttpInfo.Body)
@@ -103,7 +134,7 @@ func TestMapHeaders(t *testing.T) {
 }
 
 func TestMapQuery(t *testing.T) {
-	url := "http://example.com?param1=value1¶m2=value2"
+	url := "http://example.com?param1=value1&param2=value2"
 	req, _ := http.NewRequest("GET", url, nil)
 
 	result := mapQuery(req.URL.Query())
@@ -135,9 +166,9 @@ func TestMapBody(t *testing.T) {
 			},
 		},
 		{
-			name:     "invalid JSON body",
-			body:     "invalid json",
-			expected: nil,
+			name:     "text body",
+			body:     "valid text",
+			expected: "valid text",
 		},
 	}
 

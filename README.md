@@ -5,7 +5,7 @@
 
   ![license](https://img.shields.io/badge/license-MIT-green.svg)
   ![go](https://img.shields.io/badge/golang-1.23-blue.svg?logo=go)
-  [![gh-stars](https://img.shields.io/github/stars/rellyson/http-echo?logo=github)](https://github.com/rellyson/http-echo/stargazers)
+  [![gh-stars](https://img.shields.io/github/stars/rellyson/http-echo?logo=github)](https://github.com/rellyson/http-echo)
   [![docker-pulls](https://img.shields.io/docker/pulls/rellyson/http-echo.svg?logo=docker)](https://hub.docker.com/repository/docker/rellyson/http-echo)
 </div>
 
@@ -24,7 +24,8 @@ The HTTP Echo server provides the following features:
   - **queries**: query parameters
   - **params**: path parameters
   - **body**: request body
-- Returns a custom status code for a request (provided via query) - **TBD**.
+- Returns a custom status code for a request (provided via query).
+  - E.g. `http://127.0.0.1:3000/?status=404` returns a `404` response code.
 - Exports metrics in `prometheus` format for monitoring.
 
 ## Usage

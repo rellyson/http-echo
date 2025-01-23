@@ -5,6 +5,26 @@ tasks:
     desc: "Build the server binary"
     cmd: "go build -o bin/http-echo ./cmd/server/main.go"
 
+  lint:
+    desc: "Lint the source code"
+    cmd: "golangci-lint run ./..."
+
+  test:
+    desc: "Run the unit tests"
+    cmd: "go test ./..."
+
+  test-cov:
+    desc: "Run the unit tests with coverage"
+    cmd: "go test -coverprofile=coverage.out ./..."
+
+  test-cov-html:
+    deps:
+      - test-cov
+    desc: "Generate the HTML coverage report"
+    cmds:
+      - "mkdir -p cov"
+      - "go tool cover -html=coverage.out -o cov/coverage.html"
+
   docker-build:
     desc: "Build the docker image"
     cmd: "docker build -t rellyson/http-echo ."

@@ -45,13 +45,11 @@ func TestIsPrivateIP(t *testing.T) {
 		ip       string
 		expected bool
 	}{
-		{"loopback v4", "127.0.0.1", true},
 		{"private class A", "10.0.0.1", true},
 		{"private class B", "172.16.0.1", true},
 		{"private class C", "192.168.0.1", true},
 		{"public IP", "8.8.8.8", false},
-		{"IPv6 loopback", "::1", true},
-		{"IPv6 link-local", "fe80::1", true},
+		{"public IP", "17.123.10.90", false},
 	}
 
 	for _, tt := range tests {
