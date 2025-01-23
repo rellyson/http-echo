@@ -36,17 +36,17 @@ jobs:
       - name: Build
         run: task build
 
-      - name: Lint with golangci-lint
-        run: golangci-lint run ./...
+      - name: Lint
+        run: task lint
 
-      # - name: Test with go
-      #   run: go test ./... -json > TestResults-${{ matrix.go-version }}.json
+      - name: Test cov
+        run: task test-cov-html
 
-      # - name: Upload test results
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: go-results-${{ matrix.go-version }}
-      #     path: TestResults-${{ matrix.go-version }}.json
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-results-${{ matrix.go-version }}
+          path: cov/coverage.html
 
   build-and-push-image:
     runs-on: ubuntu-latest

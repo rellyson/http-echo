@@ -5,16 +5,14 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/rellyson/http-echo/pkg/netutils"
-	"github.com/rellyson/http-echo/pkg/version"
 )
 
 const (
-	httpHeaderAppName    = "X-App-Name"
-	httpHeaderAppVersion = "X-App-Version"
-	httpHeaderAppBuild   = "X-App-Build"
+	httpHeaderAppName = "X-App-Name"
 )
 
 // EchoResponse is the response for the echo request.
@@ -45,8 +43,22 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	setHeaders(w)
-	w.WriteHeader(http.StatusOK)
+	statusCode := http.StatusOK
+
+	// set custom status code if query parameter is set
+	if r.URL.Query().Get("status") != "" {
+		s, err := strconv.Atoi(r.URL.Query().Get("status"))
+
+		if err != nil {
+			panic(err)
+		} else {
+			statusCode = s
+		}
+	}
+
+	w.Header().Set(httpHeaderAppName, "http-echo")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
 
 	response := &EchoResponse{
 		HostInfo: HostInfoResponse{
@@ -64,20 +76,6 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		panic(err)
 	}
-}
-
-// setHeaders sets the headers for the response.
-func setHeaders(w http.ResponseWriter) {
-	v, err := version.GetVersion()
-
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set(httpHeaderAppName, "http-echo")
-	w.Header().Set(httpHeaderAppVersion, v.Version)
-	w.Header().Set(httpHeaderAppBuild, v.Build)
 }
 
 // mapHeaders maps the headers to a map.

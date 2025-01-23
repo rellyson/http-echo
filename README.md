@@ -24,7 +24,8 @@ The HTTP Echo server provides the following features:
   - **queries**: query parameters
   - **params**: path parameters
   - **body**: request body
-- Returns a custom status code for a request (provided via query) - **TBD**.
+- Returns a custom status code for a request (provided via query).
+  - E.g. `http://127.0.0.1:3000/?status=404` returns a `404` response code.
 - Exports metrics in `prometheus` format for monitoring.
 
 ## Usage
