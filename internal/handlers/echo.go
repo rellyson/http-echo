@@ -31,10 +31,10 @@ type HostInfoResponse struct {
 
 // HttpInfo contains the HTTP information.
 type HttpInfoResponse struct {
-	Headers    map[string]string `json:"headers"`              // request headers
-	Queries    map[string]string `json:"queries,omitempty"`    // query parameters
-	PathParams []string          `json:"pathParams,omitempty"` // path parameters
-	Body       interface{}       `json:"body,omitempty"`       // request body
+	Headers map[string]string `json:"headers"`           // request headers
+	Queries map[string]string `json:"queries,omitempty"` // query parameters
+	Params  []string          `json:"params,omitempty"`  // path parameters
+	Body    interface{}       `json:"body,omitempty"`    // request body
 }
 
 // Handles the echo request.
@@ -54,10 +54,10 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 			IP:       hostinfo.IP.String(),
 		},
 		HttpInfo: HttpInfoResponse{
-			Headers:    mapHeaders(r.Header),
-			Queries:    mapQuery(r.URL.Query()),
-			PathParams: mapPathParams(r.URL.Path),
-			Body:       mapBody(r.Body),
+			Headers: mapHeaders(r.Header),
+			Queries: mapQuery(r.URL.Query()),
+			Params:  mapPathParams(r.URL.Path),
+			Body:    mapBody(r.Body),
 		},
 	}
 

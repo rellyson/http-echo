@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,7 @@ import (
 
 var (
 	listenFlag          = flag.String("listen", ":3000", "Address to listen on")
+	metricsPathFlag     = flag.String("metrics", "/metrics", "Path to expose metrics")
 	defaultReadTimeout  = 3 * time.Second
 	defaultWriteTimeout = 3 * time.Second
 )
@@ -25,7 +27,7 @@ func main() {
 	flag.Parse()
 
 	mux := http.NewServeMux()
-	mux.Handle("GET /metrics", handlers.Metrics())
+	mux.Handle(fmt.Sprintf("GET %s", *metricsPathFlag), handlers.Metrics())
 	mux.HandleFunc("GET /health", handlers.HealthCheck)
 	mux.HandleFunc("/", handlers.Echo)
 

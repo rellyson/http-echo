@@ -71,9 +71,9 @@ func isPrivateIP(ip net.IP) bool {
 	var privateIPBlocks []*net.IPNet
 
 	for _, cidr := range []string{
-		"127.0.0.0/8",    // IPv4 loopback
-		"::1/128",        // IPv6 loopback
-		"fe80::/10",      // IPv6 link-local
+		//"127.0.0.0/8",    // IPv4 loopback
+		//"::1/128",        // IPv6 loopback
+		//"fe80::/10",      // IPv6 link-local
 		"10.0.0.0/8",     // RFC1918
 		"172.16.0.0/12",  // RFC1918
 		"192.168.0.0/16", // RFC1918
