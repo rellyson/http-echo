@@ -1,5 +1,5 @@
 <div  align="center">
-  <img src="./assets/echo-logo.jpg" alt="Echo Logo" width="200">
+  <img src="https://raw.githubusercontent.com/rellyson/http-echo/refs/heads/main/assets/echo-logo.jpg" alt="echo-logo" width="200">
   <h2>HTTP Echo</h2>
   <p>A simple HTTP server that echoes back request information.</p>
 
