@@ -50,8 +50,11 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
-    environment: prod
     needs: run-tests
+    environment: prod
+    permissions:
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout repository
